@@ -618,6 +618,13 @@
                         <button class="setting-btn" data-bg="beige">米色</button>
                     </div>
                 </div>
+                <div class="setting-item">
+                    <span class="setting-label">背景透明度</span>
+                    <div class="setting-value" style="width: 100%;">
+                        <input type="range" id="opacity-slider" min="0" max="1" step="0.05" value="0.8" style="width: 100%; margin: 10px 0;">
+                        <span id="opacity-value" style="font-size: 12px; color: #666;">80%</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -677,6 +684,7 @@
         let currentChapter = '1';
         let currentFontSize = 'medium';
         let currentBgColor = 'white';
+        let currentOpacity = 0.8;
         
         // 初始化函数
         function init() {
@@ -692,10 +700,12 @@
             const savedLang = localStorage.getItem('bible_lang');
             const savedFontSize = localStorage.getItem('bible_font_size');
             const savedBgColor = localStorage.getItem('bible_bg_color');
+            const savedOpacity = localStorage.getItem('bible_opacity');
             
             if (savedLang) currentLang = savedLang;
             if (savedFontSize) currentFontSize = savedFontSize;
             if (savedBgColor) currentBgColor = savedBgColor;
+            if (savedOpacity) currentOpacity = parseFloat(savedOpacity);
             
             // 应用设置
             document.body.className = currentFontSize + ' ' + currentBgColor;
@@ -706,6 +716,13 @@
                 btn.classList.toggle('active', btn.dataset.bg === currentBgColor);
             });
             document.getElementById('lang-toggle').textContent = currentLang === 'zh' ? 'English' : '中文';
+            
+            // 应用透明度设置
+            if (document.getElementById('opacity-slider')) {
+                document.getElementById('opacity-slider').value = currentOpacity;
+                document.getElementById('opacity-value').textContent = Math.round(currentOpacity * 100) + '%';
+            }
+            updateBackgroundOpacity();
         }
         
         // 保存设置
@@ -713,6 +730,7 @@
             localStorage.setItem('bible_lang', currentLang);
             localStorage.setItem('bible_font_size', currentFontSize);
             localStorage.setItem('bible_bg_color', currentBgColor);
+            localStorage.setItem('bible_opacity', currentOpacity);
         }
         
         // 填充书卷选择
@@ -766,6 +784,44 @@
                 `;
                 content.appendChild(verseDiv);
             });
+        }
+        
+        // 更新背景透明度
+        function updateBackgroundOpacity() {
+            const overlay = document.querySelector('body::before');
+            if (currentBgColor === 'beige') {
+                document.body.style.setProperty('--bg-opacity', currentOpacity);
+                // 直接修改伪元素的透明度
+                const style = document.createElement('style');
+                style.textContent = `
+                    body::before {
+                        background: rgba(255, 255, 255, ${currentOpacity});
+                    }
+                    body.beige::before {
+                        background: rgba(245, 242, 233, ${currentOpacity});
+                    }
+                `;
+                document.head.appendChild(style);
+                // 移除旧的样式
+                const oldStyles = document.querySelectorAll('style[data-bg-opacity]');
+                oldStyles.forEach(style => style.remove());
+                style.setAttribute('data-bg-opacity', 'true');
+            } else {
+                const style = document.createElement('style');
+                style.textContent = `
+                    body::before {
+                        background: rgba(255, 255, 255, ${currentOpacity});
+                    }
+                    body.beige::before {
+                        background: rgba(245, 242, 233, ${currentOpacity});
+                    }
+                `;
+                document.head.appendChild(style);
+                // 移除旧的样式
+                const oldStyles = document.querySelectorAll('style[data-bg-opacity]');
+                oldStyles.forEach(style => style.remove());
+                style.setAttribute('data-bg-opacity', 'true');
+            }
         }
         
         // 绑定事件
@@ -875,8 +931,19 @@
                     document.querySelectorAll('.setting-btn[data-bg]').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     saveSettings();
+                    updateBackgroundOpacity();
                 });
             });
+            
+            // 背景透明度设置
+            if (document.getElementById('opacity-slider')) {
+                document.getElementById('opacity-slider').addEventListener('input', function() {
+                    currentOpacity = parseFloat(this.value);
+                    document.getElementById('opacity-value').textContent = Math.round(currentOpacity * 100) + '%';
+                    updateBackgroundOpacity();
+                    saveSettings();
+                });
+            }
         }
         
         // 显示模态框
