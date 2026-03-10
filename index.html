@@ -170,20 +170,17 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background-color: rgba(255, 255, 255, 0.95);
+            background-color: #f8f8f8;
             backdrop-filter: blur(10px);
-            border-top: 1px solid #f0f0f0;
-            padding: 12px 0;
+            padding: 16px;
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
+            gap: 12px;
             z-index: 99;
-            box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.05);
         }
         
         body.beige .toolbar {
-            background-color: rgba(245, 242, 233, 0.95);
-            border-top-color: #e0d9c8;
-            box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.03);
+            background-color: #f5f2e9;
         }
         
         .tool-btn {
@@ -193,51 +190,66 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            padding: 12px 8px;
+            padding: 16px 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            border-radius: 8px;
+            transition: all 0.3s ease;
+            border-radius: 12px;
             min-height: 48px;
+            background: #f8f8f8;
+            box-shadow: 5px 5px 10px rgba(163, 177, 198, 0.1),
+                        -5px -5px 10px rgba(255, 255, 255, 0.8);
+        }
+        
+        body.beige .tool-btn {
+            background: #f5f2e9;
+            box-shadow: 5px 5px 10px rgba(163, 177, 198, 0.1),
+                        -5px -5px 10px rgba(255, 255, 255, 0.6);
         }
         
         .tool-btn:hover {
-            background-color: rgba(0, 0, 0, 0.03);
             transform: translateY(-2px);
         }
         
-        body.beige .tool-btn:hover {
-            background-color: rgba(0, 0, 0, 0.02);
+        .tool-btn:active {
+            box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.2),
+                        inset -3px -3px 6px rgba(255, 255, 255, 0.8);
+            transform: scale(0.98);
         }
         
-        .tool-btn:active {
-            transform: scale(0.95);
+        body.beige .tool-btn:active {
+            box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.2),
+                        inset -3px -3px 6px rgba(255, 255, 255, 0.6);
         }
         
         .tool-btn.active {
-            color: #8b7355;
+            box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.2),
+                        inset -3px -3px 6px rgba(255, 255, 255, 0.8);
         }
         
-        .tool-btn.active span:first-child {
-            font-size: 24px;
-        }
-        
-        .tool-btn.active span:last-child {
-            font-weight: 500;
+        body.beige .tool-btn.active {
+            box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.2),
+                        inset -3px -3px 6px rgba(255, 255, 255, 0.6);
         }
         
         .tool-btn span:first-child {
-            font-size: 22px;
+            font-size: 20px;
+            color: #555;
             transition: all 0.2s ease;
         }
         
         .tool-btn span:last-child {
             font-size: 12px;
-            color: #666;
+            color: #888;
+            font-weight: 400;
             transition: all 0.2s ease;
         }
         
+        body.beige .tool-btn span:first-child {
+            color: #666;
+        }
+        
         body.beige .tool-btn span:last-child {
-            color: #7d6b55;
+            color: #999;
         }
         
         /* 模态框 */
@@ -753,18 +765,31 @@
                 displayVerse();
             });
             
+            // 重置所有按钮状态
+            function resetButtonStates() {
+                document.querySelectorAll('.tool-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+            }
+            
             // 书签按钮
             document.getElementById('bookmark-btn').addEventListener('click', function() {
+                resetButtonStates();
+                this.classList.add('active');
                 showBookmarkModal();
             });
             
             // 笔记按钮
             document.getElementById('note-btn').addEventListener('click', function() {
+                resetButtonStates();
+                this.classList.add('active');
                 showNoteModal();
             });
             
             // 设置按钮
             document.getElementById('settings-btn').addEventListener('click', function() {
+                resetButtonStates();
+                this.classList.add('active');
                 showSettingsModal();
             });
             
@@ -776,14 +801,17 @@
             // 关闭模态框
             document.getElementById('close-bookmark-modal').addEventListener('click', function() {
                 hideModal('bookmark-modal');
+                resetButtonStates();
             });
             
             document.getElementById('close-note-modal').addEventListener('click', function() {
                 hideModal('note-modal');
+                resetButtonStates();
             });
             
             document.getElementById('close-settings-modal').addEventListener('click', function() {
                 hideModal('settings-modal');
+                resetButtonStates();
             });
             
             // 笔记保存
